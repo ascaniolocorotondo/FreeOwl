@@ -1,0 +1,4 @@
+# Generati dallo script di build
+dist/
+download/
+tools/

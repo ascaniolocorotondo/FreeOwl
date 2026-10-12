@@ -1,0 +1,47 @@
+{
+  "manifest_version": 2,
+  "name": "Free Owl",
+  "version": "1.0.0",
+  "description": "Nuova scheda con orologio, contatore dei tracker bloccati, pulsante Vola via e Modalità Notte.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "freeowl@freeowl.local",
+      "strict_min_version": "128.0"
+    }
+  },
+  "icons": {
+    "16": "icons/owl-16.png",
+    "32": "icons/owl-32.png",
+    "48": "icons/owl-48.png",
+    "96": "icons/owl-96.png"
+  },
+  "permissions": [
+    "<all_urls>",
+    "webRequest",
+    "storage",
+    "browsingData",
+    "tabs",
+    "search"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "browser_action": {
+    "default_title": "Free Owl",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/owl-16.png",
+      "32": "icons/owl-32.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["night.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

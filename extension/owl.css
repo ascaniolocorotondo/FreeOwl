@@ -1,0 +1,75 @@
+:root {
+  --plum: #4e1a3d;
+  --plum-dark: #3a1230;
+  --plum-light: #6a2754;
+  --cream: #f5e2aa;
+  --cream-soft: rgba(245, 226, 170, 0.75);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--plum);
+  color: var(--cream);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 2px solid var(--cream);
+  border-radius: 999px;
+  padding: 0.6em 1.4em;
+  background: transparent;
+  color: var(--cream);
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+button:hover {
+  background: var(--cream);
+  color: var(--plum);
+}
+
+button.on {
+  background: var(--cream);
+  color: var(--plum);
+}
+
+button.confirm {
+  background: #e8a33d;
+  border-color: #e8a33d;
+  color: var(--plum-dark);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.bubble {
+  position: relative;
+  background: var(--cream);
+  color: var(--plum);
+  border-radius: 18px;
+  padding: 14px 20px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.bubble strong {
+  font-size: 1.5em;
+  display: block;
+}
+
+.bubble small {
+  display: block;
+  font-weight: 400;
+  opacity: 0.75;
+  margin-top: 4px;
+}

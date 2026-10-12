@@ -1,0 +1,92 @@
+{
+  "policies": {
+    "DisableFirefoxAccounts": false,
+    "HttpsOnlyMode": "force_enabled",
+    "Cookies": {
+      "Behavior": "reject-foreign",
+      "BehaviorPrivateBrowsing": "reject-foreign",
+      "Locked": false
+    },
+    "SearchEngines": {
+      "Remove": [
+        "Google",
+        "Bing",
+        "Yahoo",
+        "Ecosia",
+        "Perplexity",
+        "Baidu",
+        "Yandex",
+        "Amazon.com",
+        "eBay",
+        "Twitter"
+      ],
+      "Add": [
+        {
+          "Name": "Brave Search",
+          "URLTemplate": "https://search.brave.com/search?q={searchTerms}",
+          "Method": "GET",
+          "IconURL": "https://search.brave.com/favicon.ico",
+          "Alias": "@brave",
+          "Description": "Brave Search - indice indipendente, nessun tracciamento"
+        },
+        {
+          "Name": "Startpage",
+          "URLTemplate": "https://www.startpage.com/sp/search?query={searchTerms}",
+          "Method": "GET",
+          "IconURL": "https://www.startpage.com/favicon.ico",
+          "Alias": "@sp",
+          "Description": "Startpage - risultati anonimi"
+        },
+        {
+          "Name": "Mojeek",
+          "URLTemplate": "https://www.mojeek.com/search?q={searchTerms}",
+          "Method": "GET",
+          "IconURL": "https://www.mojeek.com/favicon.ico",
+          "Alias": "@mj",
+          "Description": "Mojeek - indice indipendente, nessun tracciamento"
+        },
+        {
+          "Name": "Qwant",
+          "URLTemplate": "https://www.qwant.com/?q={searchTerms}",
+          "Method": "GET",
+          "IconURL": "https://www.qwant.com/favicon.ico",
+          "Alias": "@qw",
+          "Description": "Qwant - motore europeo"
+        }
+      ]
+    },
+    "ExtensionSettings": {
+      "freeowl@freeowl.local": {
+        "installation_mode": "allowed",
+        "default_area": "navbar"
+      },
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+      }
+    },
+    "3rdparty": {
+      "Extensions": {
+        "uBlock0@raymondhill.net": {
+          "toOverwrite": {
+            "filterLists": [
+              "user-filters",
+              "ublock-filters",
+              "ublock-badware",
+              "ublock-privacy",
+              "ublock-quick-fixes",
+              "ublock-unbreak",
+              "easylist",
+              "easyprivacy",
+              "urlhaus-1",
+              "plowe-0",
+              "fanboy-cookiemonster",
+              "ublock-cookies-easylist",
+              "ITA-0"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

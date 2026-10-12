@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>Nuova scheda</title>
+  <link rel="icon" href="icons/owl-32.png">
+  <link rel="stylesheet" href="owl.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 7vh 16px 32px;
+      gap: 4vh;
+    }
+
+    .clock {
+      text-align: center;
+    }
+
+    #time {
+      font-size: clamp(64px, 12vw, 132px);
+      font-weight: 300;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    #date {
+      margin-top: 8px;
+      font-size: 20px;
+      color: var(--cream-soft);
+      text-transform: capitalize;
+    }
+
+    #greeting {
+      margin-top: 4px;
+      font-size: 16px;
+      color: var(--cream-soft);
+    }
+
+    .owl-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .owl-row img {
+      width: 130px;
+      height: auto;
+    }
+
+    .owl-row .bubble {
+      max-width: 280px;
+    }
+
+    /* fumetto che "esce" dal gufo */
+    .owl-row .bubble::before {
+      content: "";
+      position: absolute;
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 8px solid transparent;
+      border-right: 12px solid var(--cream);
+      border-left: 0;
+    }
+
+    form {
+      width: min(600px, 100%);
+    }
+
+    #q {
+      width: 100%;
+      padding: 16px 24px;
+      font-size: 18px;
+      border-radius: 999px;
+      border: 2px solid var(--plum-light);
+      background: var(--plum-dark);
+      color: var(--cream);
+      outline: none;
+    }
+
+    #q::placeholder {
+      color: var(--cream-soft);
+    }
+
+    #q:focus {
+      border-color: var(--cream);
+    }
+  </style>
+</head>
+<body>
+  <section class="clock">
+    <div id="time">--:--</div>
+    <div id="date"></div>
+    <div id="greeting"></div>
+  </section>
+
+  <section class="owl-row">
+    <img src="owl.png" alt="Gufo di Free Owl">
+    <div class="bubble">
+      Ho bloccato
+      <strong><span id="total">0</span> tracker</strong>
+      per te!
+      <small>Oggi: <span id="today">0</span></small>
+    </div>
+  </section>
+
+  <form id="search">
+    <input id="q" type="search" placeholder="Cerca sul web…" autocomplete="off" autofocus>
+  </form>
+
+  <div class="actions">
+    <button id="flyAway" type="button">🦉 Vola via</button>
+    <button id="night" type="button">🌙 Modalità Notte</button>
+  </div>
+
+  <script src="shared.js"></script>
+  <script src="newtab.js"></script>
+</body>
+</html>

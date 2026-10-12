@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="owl.css">
+  <style>
+    body {
+      width: 300px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      text-align: center;
+    }
+
+    img {
+      width: 64px;
+    }
+
+    .actions {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    button {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <img src="owl.png" alt="">
+  <div class="bubble">
+    Ho bloccato
+    <strong><span id="total">0</span> tracker</strong>
+    per te!
+    <small>Oggi: <span id="today">0</span></small>
+  </div>
+  <div class="actions">
+    <button id="flyAway" type="button">🦉 Vola via</button>
+    <button id="night" type="button">🌙 Modalità Notte</button>
+  </div>
+  <script src="shared.js"></script>
+</body>
+</html>

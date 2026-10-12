@@ -1,0 +1,62 @@
+name: Build Free Owl
+
+# Ogni giorno controlla se e' uscito un nuovo LibreWolf per Windows.
+# Se si', ricostruisce Free Owl e lo pubblica nei Download (Releases).
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cerca l'ultima versione di LibreWolf
+        id: ver
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $page = Invoke-WebRequest "https://librewolf.net/installation/windows/" -UseBasicParsing
+          $link = $page.Links.href | Where-Object { $_ -match "windows-x86_64-portable\.zip$" } | Select-Object -First 1
+          if (-not $link) { throw "Link al pacchetto portable non trovato" }
+          $version = [regex]::Match($link, "librewolf/([^/]+)/").Groups[1].Value
+          "version=$version" >> $env:GITHUB_OUTPUT
+          gh release view "v$version" *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Free Owl $version e' gia' pubblicato: niente da fare."
+            "skip=true" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "Nuova versione: $version"
+            "skip=false" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Costruisci Free Owl
+        if: steps.ver.outputs.skip != 'true'
+        shell: powershell
+        run: .\build.ps1 -Version "${{ steps.ver.outputs.version }}"
+
+      - name: Pubblica nei Download
+        if: steps.ver.outputs.skip != 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = "${{ steps.ver.outputs.version }}"
+          $zip = "dist/FreeOwl-$v-windows-x86_64-portable.zip"
+          $sha = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+          $notes = @"
+          Free Owl basato su **LibreWolf $v**.
+
+          **Come si installa:** scarica lo zip qui sotto, estrailo dove vuoi e apri ``FreeOwl.exe``.
+
+          Windows potrebbe mostrare "Windows ha protetto il PC": clicca **Ulteriori informazioni** e poi **Esegui comunque** (Free Owl non ha una firma digitale a pagamento).
+
+          SHA256: ``$sha``
+          "@
+          gh release create "v$v" $zip --title "Free Owl $v" --notes $notes
