@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Cerca l'ultima versione di LibreWolf
         id: ver
@@ -35,6 +35,8 @@ jobs:
             Write-Host "Nuova versione: $version"
             "skip=false" >> $env:GITHUB_OUTPUT
           }
+          # "gh release view" fallisce quando la versione non esiste ancora: non e' un errore.
+          exit 0
 
       - name: Costruisci Free Owl
         if: steps.ver.outputs.skip != 'true'
