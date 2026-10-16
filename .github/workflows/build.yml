@@ -1,64 +1,170 @@
 name: Build Free Owl
 
-# Ogni giorno controlla se e' uscito un nuovo LibreWolf per Windows.
-# Se si', ricostruisce Free Owl e lo pubblica nei Download (Releases).
+# Ogni giorno controlla se e' uscito un nuovo LibreWolf.
+# Se si' (o se manca una delle versioni), ricostruisce Free Owl per Windows e Linux
+# e lo pubblica nei Download (Releases).
 on:
   schedule:
     - cron: "0 6 * * *"
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Pubblica nei Download (false = solo prova)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      release_exists: ${{ steps.ver.outputs.release_exists }}
+      need_windows: ${{ steps.ver.outputs.need_windows }}
+      need_linux: ${{ steps.ver.outputs.need_linux }}
+    steps:
+      - name: Cerca l'ultima versione di LibreWolf
+        id: ver
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          version=$(curl -fsSL https://librewolf.net/installation/windows/ \
+            | grep -oP 'librewolf/\K[^/]+(?=/librewolf-[^"]+-windows-x86_64-portable\.zip)' | head -n1)
+          [ -n "$version" ] || { echo "Versione non trovata"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          assets=$(gh release view "v$version" --json assets --jq '.assets[].name' 2>/dev/null || true)
+          if gh release view "v$version" >/dev/null 2>&1; then
+            echo "release_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "release_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          if echo "$assets" | grep -q 'windows-x86_64-portable\.zip$'; then
+            echo "need_windows=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "need_windows=true" >> "$GITHUB_OUTPUT"
+          fi
+          if echo "$assets" | grep -q 'linux-x86_64\.AppImage$'; then
+            echo "need_linux=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "need_linux=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "LibreWolf $version"
+          echo "Gia' pubblicati: ${assets:-niente}"
+
+  windows:
+    needs: check
+    if: needs.check.outputs.need_windows == 'true'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
 
-      - name: Cerca l'ultima versione di LibreWolf
-        id: ver
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          $page = Invoke-WebRequest "https://librewolf.net/installation/windows/" -UseBasicParsing
-          $link = $page.Links.href | Where-Object { $_ -match "windows-x86_64-portable\.zip$" } | Select-Object -First 1
-          if (-not $link) { throw "Link al pacchetto portable non trovato" }
-          $version = [regex]::Match($link, "librewolf/([^/]+)/").Groups[1].Value
-          "version=$version" >> $env:GITHUB_OUTPUT
-          gh release view "v$version" *> $null
-          if ($LASTEXITCODE -eq 0) {
-            Write-Host "Free Owl $version e' gia' pubblicato: niente da fare."
-            "skip=true" >> $env:GITHUB_OUTPUT
-          } else {
-            Write-Host "Nuova versione: $version"
-            "skip=false" >> $env:GITHUB_OUTPUT
-          }
-          # "gh release view" fallisce quando la versione non esiste ancora: non e' un errore.
-          exit 0
-
-      - name: Costruisci Free Owl
-        if: steps.ver.outputs.skip != 'true'
+      - name: Costruisci Free Owl per Windows
         shell: powershell
-        run: .\build.ps1 -Version "${{ steps.ver.outputs.version }}"
+        run: .\build.ps1 -Version "${{ needs.check.outputs.version }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freeowl-windows
+          path: dist/FreeOwl-*-windows-x86_64-portable.zip
+
+  linux:
+    needs: check
+    if: needs.check.outputs.need_linux == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepara gli strumenti
+        run: |
+          pip install pillow
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libdbus-glib-1-2 libgtk-3-0t64 libasound2t64 xvfb
+
+      - name: Costruisci Free Owl per Linux
+        run: python3 build_linux.py --version "${{ needs.check.outputs.version }}" --appimage
+
+      - name: Prova che si avvii davvero
+        run: |
+          export HOME="$(mktemp -d)"
+          # primo avvio: installa l'estensione del gufo
+          timeout 120 xvfb-run -a dist-linux/freeowl/freeowl --headless --screenshot "$RUNNER_TEMP/primo-avvio.png" about:blank || true
+          grep -q 'installedDistroAddon.freeowl@freeowl.local' "$HOME/.freeowl/prefs.js" \
+            && echo "OK: Free Owl si avvia e l'estensione del gufo e' installata" \
+            || { echo "ERRORE: estensione del gufo non installata"; exit 1; }
+          # secondo avvio: foto della nuova scheda
+          timeout 120 xvfb-run -a dist-linux/freeowl/freeowl --headless --window-size=1280,800 \
+            --screenshot "$RUNNER_TEMP/nuova-scheda.png" \
+            "moz-extension://6f1e0c2a-4b7d-4e8a-9c3f-0d5a7b2e9f41/newtab.html" || true
+          cp "$RUNNER_TEMP"/*.png dist-linux/ || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freeowl-linux
+          path: |
+            dist-linux/FreeOwl-*-linux-x86_64.tar.gz
+            dist-linux/FreeOwl-*-linux-x86_64.AppImage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freeowl-linux-screenshots
+          path: dist-linux/*.png
+          if-no-files-found: ignore
+
+  publish:
+    needs: [check, windows, linux]
+    if: >-
+      always() &&
+      github.event.inputs.publish != 'false' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      (needs.windows.result == 'success' || needs.linux.result == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: freeowl-*
+          path: files
+          merge-multiple: true
 
       - name: Pubblica nei Download
-        if: steps.ver.outputs.skip != 'true'
-        shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.check.outputs.version }}
         run: |
-          $v = "${{ steps.ver.outputs.version }}"
-          $zip = "dist/FreeOwl-$v-windows-x86_64-portable.zip"
-          $sha = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
-          $notes = @"
-          Free Owl basato su **LibreWolf $v**.
+          rm -f files/*.png
+          ls -la files
+          if [ "${{ needs.check.outputs.release_exists }}" = "true" ]; then
+            gh release upload "v$VERSION" files/* --clobber
+            exit 0
+          fi
 
-          **Come si installa:** scarica lo zip qui sotto, estrailo dove vuoi e apri ``FreeOwl.exe``.
+          cd files
+          sums=$(sha256sum *)
+          cat > ../notes.md <<EOF
+          Free Owl basato su **LibreWolf $VERSION**.
 
-          Windows potrebbe mostrare "Windows ha protetto il PC": clicca **Ulteriori informazioni** e poi **Esegui comunque** (Free Owl non ha una firma digitale a pagamento).
+          ### Windows
+          Scarica \`FreeOwl-$VERSION-windows-x86_64-portable.zip\`, estrailo dove vuoi e apri \`FreeOwl.exe\`.
+          Se Windows dice "Windows ha protetto il PC": **Ulteriori informazioni** e poi **Esegui comunque**.
 
-          SHA256: ``$sha``
-          "@
-          gh release create "v$v" $zip --title "Free Owl $v" --notes $notes
+          ### Linux
+          **Il modo piu' facile:** scarica \`FreeOwl-$VERSION-linux-x86_64.AppImage\`, rendilo eseguibile (tasto destro, Proprieta', "Consenti di eseguire come programma") e aprilo.
+          **Oppure:** scarica il \`.tar.gz\`, estrailo e lancia \`./freeowl/install.sh\`: Free Owl comparira' nel menu delle applicazioni.
+
+          ### SHA256
+          \`\`\`
+          $sums
+          \`\`\`
+          EOF
+          cd ..
+          sed -i 's/^          //' notes.md
+          gh release create "v$VERSION" files/* --title "Free Owl $VERSION" --notes-file notes.md
