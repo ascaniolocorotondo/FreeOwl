@@ -5,7 +5,7 @@
 <h1 align="center">Free Owl 🦉</h1>
 
 <p align="center">
-  Un browser per Windows che rispetta la tua privacy, basato su <a href="https://librewolf.net">LibreWolf</a> e Firefox.
+  Un browser per Windows e Linux che rispetta la tua privacy, basato su <a href="https://librewolf.net">LibreWolf</a> e Firefox.
 </p>
 
 <p align="center">
@@ -28,42 +28,73 @@ E sotto, tutta la protezione di LibreWolf: niente telemetria, protezione dal fin
 
 ## Come si installa
 
-1. Vai nei [**Download (Releases)**](../../releases/latest) e scarica `FreeOwl-...-windows-x86_64-portable.zip`.
+Tutto si scarica dai [**Download (Releases)**](../../releases/latest).
+
+### 🪟 Windows
+
+1. Scarica `FreeOwl-...-windows-x86_64-portable.zip`.
 2. Estrai lo zip dove vuoi (per esempio in `Documenti`).
 3. Apri `FreeOwl.exe`.
 
 > **"Windows ha protetto il PC"?** È normale: Free Owl non ha una firma digitale a pagamento.
 > Clicca **Ulteriori informazioni** e poi **Esegui comunque**.
 
-Free Owl è *portable*: non serve installarlo e i tuoi dati restano nella cartella `Profiles`.
+Free Owl per Windows è *portable*: non serve installarlo e i tuoi dati restano nella cartella `Profiles`.
+
+### 🐧 Linux
+
+**Il modo più facile (AppImage):**
+
+1. Scarica `FreeOwl-...-linux-x86_64.AppImage`.
+2. Tasto destro → **Proprietà** → spunta **"Consenti di eseguire come programma"** (oppure nel terminale: `chmod +x FreeOwl-*.AppImage`).
+3. Doppio clic per aprirlo.
+
+**Oppure, per averlo nel menu delle applicazioni:**
+
+```bash
+tar -xzf FreeOwl-*-linux-x86_64.tar.gz
+./freeowl/install.sh
+```
+
+Si installa solo per il tuo utente (niente `sudo`). I tuoi dati stanno in `~/.freeowl`, separati da un eventuale LibreWolf o Firefox.
 
 ## Aggiornamenti
 
 Ogni giorno GitHub controlla in automatico se è uscita una nuova versione di LibreWolf. Se sì, costruisce e pubblica il nuovo Free Owl nei [Download](../../releases).
 
-Per aggiornare: chiudi Free Owl, scarica il nuovo zip e copia la cartella `Profiles` della vecchia versione dentro quella nuova, così tieni segnalibri e impostazioni.
+Per aggiornare:
+- **Windows:** chiudi Free Owl, scarica il nuovo zip e copia la cartella `Profiles` della vecchia versione dentro quella nuova, così tieni segnalibri e impostazioni.
+- **Linux:** scarica il nuovo AppImage (o rilancia `install.sh` con il nuovo `.tar.gz`). I tuoi dati in `~/.freeowl` restano dove sono.
 
 ## Da sapere
 
-- **Solo Windows (64 bit)**, per ora.
+- **Windows e Linux a 64 bit (x86_64)**, per ora. Il Mac arriverà più avanti.
 - **Estensioni non firmate permesse**: servono per l'estensione del gufo, che è inclusa in Free Owl. Installa estensioni solo da [addons.mozilla.org](https://addons.mozilla.org).
 - **Il contatore dei tracker è una stima**: conta le richieste di terze parti bloccate prima di partire (da uBlock Origin o dalla protezione antitracciamento).
 - **Cookie di terze parti bloccati**: raramente qualche login tipo "Accedi con Google/Apple" su altri siti può non funzionare. Si risolve aggiungendo un'eccezione per quel sito (lucchetto nella barra degli indirizzi).
 
 ## Come funziona (per i curiosi)
 
-Free Owl **non ricompila** Firefox. Lo script [`build.ps1`](build.ps1):
+Free Owl **non ricompila** Firefox. Gli script [`build.ps1`](build.ps1) (Windows) e [`build_linux.py`](build_linux.py) (Linux):
 
-1. scarica LibreWolf portable ufficiale e ne verifica l'impronta SHA256;
-2. cambia nome e logo in tutte le lingue e nelle icone dei `.exe`;
-3. aggiunge le impostazioni di [`config/freeowl.cfg`](config/freeowl.cfg) e le policy di [`config/policies.json`](config/policies.json);
-4. include l'estensione Free Owl ([`extension/`](extension));
-5. crea lo zip pronto da scaricare.
+1. scaricano LibreWolf ufficiale e ne verificano l'impronta SHA256;
+2. cambiano nome e logo in tutte le lingue e nelle icone;
+3. aggiungono le impostazioni di [`config/freeowl.cfg`](config/freeowl.cfg) e le policy di [`config/policies.json`](config/policies.json);
+4. includono l'estensione Free Owl ([`extension/`](extension));
+5. creano i file pronti da scaricare.
 
-Per costruirlo da solo, su Windows:
+Il robot di GitHub, oltre a costruire la versione Linux, la avvia per davvero e controlla che l'estensione del gufo sia installata.
+
+Per costruirlo da solo:
 
 ```powershell
+# Windows
 powershell -ExecutionPolicy Bypass -File build.ps1
+```
+
+```bash
+# Linux (serve Pillow: pip install pillow)
+python3 build_linux.py --appimage
 ```
 
 ## Licenza e ringraziamenti
@@ -72,4 +103,4 @@ Free Owl è distribuito sotto la [Mozilla Public License 2.0](LICENSE).
 
 È basato su [**LibreWolf**](https://librewolf.net) e su [**Mozilla Firefox**](https://www.mozilla.org/firefox/). Free Owl è un progetto indipendente: non è affiliato né approvato da LibreWolf o Mozilla. Firefox è un marchio di Mozilla Foundation.
 
-Include [uBlock Origin](https://github.com/gorhill/uBlock) di Raymond Hill (GPLv3), installato dal sito ufficiale di Mozilla al primo avvio. Per cambiare l'icona dei `.exe` usa [rcedit](https://github.com/electron/rcedit) (MIT).
+Include [uBlock Origin](https://github.com/gorhill/uBlock) di Raymond Hill (GPLv3), installato dal sito ufficiale di Mozilla al primo avvio. Per cambiare l'icona dei `.exe` usa [rcedit](https://github.com/electron/rcedit) (MIT); per creare l'AppImage usa [appimagetool](https://github.com/AppImage/appimagetool) (MIT).
