@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Free Owl · Il browser che ti protegge</title>
+  <meta name="description" content="Free Owl: un browser gratuito per Windows e Linux che blocca i tracker e rispetta la tua privacy. Basato su LibreWolf e Firefox.">
+  <meta property="og:title" content="Free Owl 🦉">
+  <meta property="og:description" content="Il browser gratuito che blocca i tracker e rispetta la tua privacy.">
+  <meta property="og:image" content="https://ascaniolocorotondo.github.io/FreeOwl/img/screenshot.png">
+  <link rel="icon" href="img/favicon.png">
+  <style>
+    :root {
+      --plum: #4e1a3d;
+      --plum-dark: #3a1230;
+      --plum-deep: #2b0d23;
+      --plum-light: #6a2754;
+      --cream: #f5e2aa;
+      --cream-soft: rgba(245, 226, 170, 0.78);
+      --cream-faint: rgba(245, 226, 170, 0.14);
+      --amber: #e8a33d;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--plum);
+      color: var(--cream);
+      font-family: "Segoe UI", system-ui, -apple-system, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--cream); }
+
+    .wrap {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* ---------- barra in alto ---------- */
+    header.top {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(58, 18, 48, 0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--cream-faint);
+    }
+
+    header.top .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 19px;
+      text-decoration: none;
+    }
+
+    .brand img { width: 32px; height: 32px; border-radius: 8px; }
+
+    nav.links { display: flex; gap: 22px; font-size: 15px; }
+    nav.links a { text-decoration: none; color: var(--cream-soft); }
+    nav.links a:hover { color: var(--cream); }
+
+    /* ---------- hero ---------- */
+    .hero {
+      text-align: center;
+      padding: 64px 0 40px;
+    }
+
+    .hero .owl {
+      width: 120px;
+      height: auto;
+      animation: blink 6s infinite;
+    }
+
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.92); }
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 68px);
+      line-height: 1.05;
+      margin: 18px 0 12px;
+      letter-spacing: -1px;
+    }
+
+    .hero p.lead {
+      font-size: clamp(17px, 2.4vw, 21px);
+      color: var(--cream-soft);
+      max-width: 620px;
+      margin: 0 auto 30px;
+    }
+
+    .download {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 30px;
+      border-radius: 999px;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      border: 2px solid var(--cream);
+      transition: transform 0.12s, background 0.15s, color 0.15s;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn.primary {
+      background: var(--cream);
+      color: var(--plum);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--cream);
+      font-size: 16px;
+      padding: 12px 24px;
+    }
+
+    .btn.ghost:hover { background: var(--cream-faint); }
+
+    .btn svg { width: 22px; height: 22px; flex: none; }
+
+    .download small {
+      color: var(--cream-soft);
+      font-size: 14px;
+    }
+
+    .other-os {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--cream-soft);
+    }
+
+    .shot {
+      margin: 48px auto 0;
+      max-width: 940px;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--cream-faint);
+    }
+
+    .shot img { display: block; width: 100%; height: auto; }
+
+    /* ---------- sezioni ---------- */
+    section { padding: 64px 0; }
+
+    section.alt { background: var(--plum-dark); }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 38px);
+      text-align: center;
+      margin: 0 0 10px;
+    }
+
+    .sub {
+      text-align: center;
+      color: var(--cream-soft);
+      margin: 0 auto 40px;
+      max-width: 580px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--plum-light);
+      background: linear-gradient(160deg, var(--plum-light), var(--plum));
+      border: 1px solid var(--cream-faint);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    section.alt .card { background: linear-gradient(160deg, var(--plum), var(--plum-dark)); }
+
+    .card .ico { font-size: 30px; line-height: 1; }
+    .card h3 { margin: 12px 0 6px; font-size: 19px; }
+    .card p { margin: 0; color: var(--cream-soft); font-size: 15px; }
+
+    /* ---------- installazione ---------- */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: 2px solid var(--cream);
+      background: transparent;
+      color: var(--cream);
+    }
+
+    .tab[aria-selected="true"] { background: var(--cream); color: var(--plum); }
+
+    .panel {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--plum);
+      border: 1px solid var(--cream-faint);
+      border-radius: var(--radius);
+      padding: 26px 30px;
+    }
+
+    .panel[hidden] { display: none; }
+
+    .panel ol { padding-left: 22px; margin: 0; }
+    .panel li { margin: 8px 0; }
+
+    .panel h3 { margin: 22px 0 8px; font-size: 17px; }
+    .panel h3:first-child { margin-top: 0; }
+
+    code, pre {
+      font-family: "Cascadia Code", "Ubuntu Mono", Consolas, monospace;
+      background: var(--plum-deep);
+      border-radius: 8px;
+    }
+
+    code { padding: 2px 7px; font-size: 0.92em; }
+
+    pre {
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-size: 14px;
+      margin: 10px 0 0;
+    }
+
+    .note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--amber);
+      background: rgba(232, 163, 61, 0.1);
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .soon {
+      text-align: center;
+      color: var(--cream-soft);
+    }
+
+    /* ---------- FAQ ---------- */
+    details {
+      max-width: 760px;
+      margin: 0 auto 12px;
+      background: var(--plum);
+      border: 1px solid var(--cream-faint);
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 17px;
+    }
+
+    details p { color: var(--cream-soft); margin: 10px 0 0; }
+
+    /* ---------- footer ---------- */
+    footer {
+      padding: 40px 0 50px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--cream-soft);
+      border-top: 1px solid var(--cream-faint);
+    }
+
+    footer p { margin: 6px 0; }
+
+    @media (max-width: 640px) {
+      nav.links { display: none; }
+      .hero { padding-top: 44px; }
+      .panel { padding: 20px; }
+      .btn { padding: 14px 22px; font-size: 17px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero .owl { animation: none; }
+      .btn { transition: none; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="#">
+        <img src="img/logo.png" alt="">
+        Free Owl
+      </a>
+      <nav class="links">
+        <a href="#funzioni">Funzioni</a>
+        <a href="#installa">Installa</a>
+        <a href="#domande">Domande</a>
+        <a href="https://github.com/ascaniolocorotondo/FreeOwl">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <img class="owl" src="img/owl.png" alt="Il gufo di Free Owl">
+        <h1>Naviga libero.<br>Il gufo veglia su di te.</h1>
+        <p class="lead">
+          Free Owl è un browser gratuito che blocca i tracker, rifiuta i cookie e non ti spia.
+          Basato su LibreWolf e Firefox.
+        </p>
+
+        <div class="download">
+          <a id="dl-main" class="btn primary" href="https://github.com/ascaniolocorotondo/FreeOwl/releases/latest">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>
+            <span id="dl-main-label">Scarica Free Owl</span>
+          </a>
+          <small id="dl-main-info">Gratis · Windows e Linux</small>
+        </div>
+        <p class="other-os" id="dl-other"></p>
+
+        <div class="shot">
+          <img src="img/screenshot.png" alt="La nuova scheda di Free Owl con orologio, gufo e contatore dei tracker" width="1322" height="670">
+        </div>
+      </div>
+    </section>
+
+    <section id="funzioni" class="alt">
+      <div class="wrap">
+        <h2>Cosa fa il gufo per te</h2>
+        <p class="sub">Tutta la protezione di LibreWolf, più qualche idea tutta nostra.</p>
+        <div class="grid">
+          <div class="card">
+            <div class="ico">🦉</div>
+            <h3>Contatore dei tracker</h3>
+            <p>Il gufo ti dice quanti tracker ha bloccato per te, oggi e in totale.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🪶</div>
+            <h3>Vola via</h3>
+            <p>Un clic e cancelli cookie, cronologia e schede aperte. Password e account restano al sicuro.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🌙</div>
+            <h3>Modalità Notte</h3>
+            <p>Rende scuri tutti i siti chiari, lasciando foto e video con i colori giusti.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🕐</div>
+            <h3>Nuova scheda tranquilla</h3>
+            <p>Orologio, data e ricerca veloce. Niente pubblicità, niente notizie che ti distraggono.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🔍</div>
+            <h3>Ricerca senza spie</h3>
+            <p>Google e Bing sono rimossi. Usi DuckDuckGo, Brave Search, Startpage, Mojeek o Qwant.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🍪</div>
+            <h3>Meno cookie</h3>
+            <p>Cookie di terze parti bloccati e banner dei cookie rifiutati in automatico.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🔒</div>
+            <h3>HTTPS sempre</h3>
+            <p>Ogni sito viene aperto in modo cifrato, quando è possibile.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🛡️</div>
+            <h3>uBlock Origin incluso</h3>
+            <p>Il miglior blocco pubblicità, già pronto, con le liste italiane.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="installa">
+      <div class="wrap">
+        <h2>Installa Free Owl</h2>
+        <p class="sub">Ci vuole un minuto. Scegli il tuo sistema:</p>
+
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" id="tab-windows" aria-controls="panel-windows" aria-selected="true">🪟 Windows</button>
+          <button class="tab" role="tab" id="tab-linux" aria-controls="panel-linux" aria-selected="false">🐧 Linux</button>
+          <button class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false">🍎 Mac</button>
+        </div>
+
+        <div class="panel" role="tabpanel" id="panel-windows" aria-labelledby="tab-windows">
+          <ol>
+            <li><a class="dl-windows" href="https://github.com/ascaniolocorotondo/FreeOwl/releases/latest">Scarica lo zip per Windows</a>.</li>
+            <li>Estrailo dove vuoi (tasto destro → <strong>Estrai tutto</strong>), per esempio in <code>Documenti</code>.</li>
+            <li>Apri <code>FreeOwl.exe</code>. Fatto!</li>
+          </ol>
+          <div class="note">
+            <strong>"Windows ha protetto il PC"?</strong> È normale: Free Owl non ha una firma digitale a pagamento.
+            Clicca <strong>Ulteriori informazioni</strong> e poi <strong>Esegui comunque</strong>.
+          </div>
+        </div>
+
+        <div class="panel" role="tabpanel" id="panel-linux" aria-labelledby="tab-linux" hidden>
+          <h3>Il modo più facile: AppImage</h3>
+          <ol>
+            <li><a class="dl-appimage" href="https://github.com/ascaniolocorotondo/FreeOwl/releases/latest">Scarica l'AppImage</a>.</li>
+            <li>Tasto destro sul file → <strong>Proprietà</strong> → spunta <strong>"Consenti di eseguire come programma"</strong>.</li>
+            <li>Doppio clic per aprirlo.</li>
+          </ol>
+          <p>Oppure dal terminale:</p>
+          <pre><code>chmod +x FreeOwl-*.AppImage
+./FreeOwl-*.AppImage</code></pre>
+
+          <h3>Per averlo nel menu delle applicazioni</h3>
+          <p>Scarica il <a class="dl-targz" href="https://github.com/ascaniolocorotondo/FreeOwl/releases/latest"><code>.tar.gz</code></a> e lancia:</p>
+          <pre><code>tar -xzf FreeOwl-*-linux-x86_64.tar.gz
+./freeowl/install.sh</code></pre>
+          <div class="note">Si installa solo per il tuo utente, senza <code>sudo</code>. Funziona su Ubuntu, Pop!_OS, Linux Mint, Fedora e le altre distribuzioni a 64 bit.</div>
+        </div>
+
+        <div class="panel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" hidden>
+          <p class="soon">🍎 La versione per Mac è in arrivo. Il gufo sta ancora imparando a volare su macOS!</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="domande" class="alt">
+      <div class="wrap">
+        <h2>Domande</h2>
+        <p class="sub">Le cose che ci chiedono più spesso.</p>
+
+        <details>
+          <summary>È davvero gratis?</summary>
+          <p>Sì, completamente. Free Owl è open source: il codice è pubblico su GitHub e chiunque può controllarlo.</p>
+        </details>
+        <details>
+          <summary>È sicuro?</summary>
+          <p>Free Owl è basato su LibreWolf, che a sua volta è Firefox senza telemetria e con la privacy al massimo. Free Owl cambia solo nome, logo, alcune impostazioni e aggiunge l'estensione del gufo. Ogni giorno un robot controlla se esce una nuova versione di LibreWolf e aggiorna Free Owl da solo.</p>
+        </details>
+        <details>
+          <summary>Come si aggiorna?</summary>
+          <p>Scarica la nuova versione da questa pagina. Su Windows copia la cartella <code>Profiles</code> della vecchia versione dentro la nuova per tenere segnalibri e impostazioni. Su Linux i tuoi dati restano in <code>~/.freeowl</code>.</p>
+        </details>
+        <details>
+          <summary>Posso usare il mio account Mozilla?</summary>
+          <p>Sì! Puoi accedere al tuo account Mozilla per sincronizzare segnalibri e password con gli altri dispositivi. I dati sono cifrati end-to-end.</p>
+        </details>
+        <details>
+          <summary>Un sito non funziona bene, cosa faccio?</summary>
+          <p>Free Owl blocca molte cose per proteggerti. Clicca sullo scudo nella barra degli indirizzi e disattiva la protezione solo per quel sito.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>🦉 <strong>Free Owl</strong> · <a href="https://github.com/ascaniolocorotondo/FreeOwl">Codice su GitHub</a> · <a href="https://github.com/ascaniolocorotondo/FreeOwl/blob/main/LICENSE">Licenza MPL 2.0</a></p>
+      <p>Basato su <a href="https://librewolf.net">LibreWolf</a> e <a href="https://www.mozilla.org/firefox/">Mozilla Firefox</a>.
+        Free Owl è un progetto indipendente, non affiliato a LibreWolf o Mozilla. Firefox è un marchio di Mozilla Foundation.</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const REPO = "ascaniolocorotondo/FreeOwl";
+      const isLinux = /Linux|X11/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent);
+      const isMac = /Macintosh|Mac OS X/.test(navigator.userAgent);
+
+      // Schede di installazione
+      const tabs = document.querySelectorAll(".tab");
+      function selectTab(id) {
+        tabs.forEach(t => {
+          const on = t.id === id;
+          t.setAttribute("aria-selected", on);
+          document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+        });
+      }
+      tabs.forEach(t => t.addEventListener("click", () => selectTab(t.id)));
+      if (isLinux) selectTab("tab-linux");
+      if (isMac) selectTab("tab-mac");
+
+      // Link diretti all'ultima versione
+      const mb = bytes => Math.round(bytes / 1048576) + " MB";
+      fetch(`https://api.github.com/repos/${REPO}/releases/latest`)
+        .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then(rel => {
+          const find = re => rel.assets.find(a => re.test(a.name));
+          const win = find(/windows-x86_64-portable\.zip$/);
+          const appimage = find(/linux-x86_64\.AppImage$/);
+          const targz = find(/linux-x86_64\.tar\.gz$/);
+          const version = rel.tag_name.replace(/^v/, "");
+
+          const setAll = (sel, asset) => asset && document.querySelectorAll(sel).forEach(a => (a.href = asset.browser_download_url));
+          setAll(".dl-windows", win);
+          setAll(".dl-appimage", appimage);
+          setAll(".dl-targz", targz);
+
+          const main = document.getElementById("dl-main");
+          const label = document.getElementById("dl-main-label");
+          const info = document.getElementById("dl-main-info");
+          const other = document.getElementById("dl-other");
+
+          if (isMac) {
+            label.textContent = "Mac in arrivo: vedi le altre versioni";
+            info.textContent = `Versione ${version}`;
+            return;
+          }
+          const mine = isLinux ? appimage : win;
+          if (mine) {
+            main.href = mine.browser_download_url;
+            label.textContent = isLinux ? "Scarica per Linux" : "Scarica per Windows";
+            info.textContent = `Versione ${version} · ${mb(mine.size)} · Gratis`;
+          }
+          other.innerHTML = isLinux
+            ? (win ? `Usi Windows? <a href="${win.browser_download_url}">Scarica per Windows</a>` : "")
+            : (appimage ? `Usi Linux? <a href="${appimage.browser_download_url}">Scarica per Linux</a>` : "");
+        })
+        .catch(() => {
+          // Se GitHub non risponde, i pulsanti portano comunque alla pagina dei Download.
+        });
+    })();
+  </script>
+</body>
+</html>
