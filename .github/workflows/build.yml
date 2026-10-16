@@ -74,11 +74,11 @@ jobs:
   linux:
     needs: check
     if: needs.check.outputs.need_linux == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -86,7 +86,7 @@ jobs:
         run: |
           pip install pillow
           sudo apt-get update -qq
-          sudo apt-get install -y -qq libdbus-glib-1-2 libgtk-3-0t64 libasound2t64 xvfb
+          sudo apt-get install -y -qq libdbus-glib-1-2 libgtk-3-0t64 libasound2t64 xvfb desktop-file-utils
 
       - name: Costruisci Free Owl per Linux
         run: python3 build_linux.py --version "${{ needs.check.outputs.version }}" --appimage
