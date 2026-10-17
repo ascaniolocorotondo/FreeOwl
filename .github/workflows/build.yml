@@ -24,6 +24,7 @@ jobs:
       release_exists: ${{ steps.ver.outputs.release_exists }}
       need_windows: ${{ steps.ver.outputs.need_windows }}
       need_linux: ${{ steps.ver.outputs.need_linux }}
+      need_macos: ${{ steps.ver.outputs.need_macos }}
     steps:
       - name: Cerca l'ultima versione di LibreWolf
         id: ver
@@ -52,6 +53,11 @@ jobs:
           else
             echo "need_linux=true" >> "$GITHUB_OUTPUT"
           fi
+          if echo "$assets" | grep -q 'macos-apple\.dmg$'; then
+            echo "need_macos=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "need_macos=true" >> "$GITHUB_OUTPUT"
+          fi
           echo "LibreWolf $version"
           echo "Gia' pubblicati: ${assets:-niente}"
 
@@ -70,6 +76,51 @@ jobs:
         with:
           name: freeowl-windows
           path: dist/FreeOwl-*-windows-x86_64-portable.zip
+
+  macos:
+    needs: check
+    if: needs.check.outputs.need_macos == 'true'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Prepara gli strumenti
+        run: pip install pillow
+
+      - name: Costruisci Free Owl per Mac (Apple e Intel)
+        run: python3 build_macos.py --version "${{ needs.check.outputs.version }}"
+
+      - name: Prova che si avvii davvero (Mac Apple)
+        run: |
+          app="dist-macos/arm64/Free Owl.app"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleName" -c "Print :CFBundleExecutable" "$app/Contents/Info.plist"
+          export HOME="$(mktemp -d)"
+          profile="$HOME/Library/Application Support/Free Owl/Profile"
+          # primo avvio (dal lanciatore vero): installa l'estensione del gufo
+          ( "$app/Contents/MacOS/freeowl" --headless --screenshot "$RUNNER_TEMP/primo-avvio.png" about:blank & pid=$!; sleep 60; kill $pid 2>/dev/null ) || true
+          grep -q 'installedDistroAddon.freeowl@freeowl.local' "$profile/prefs.js" \
+            && echo "OK: Free Owl per Mac si avvia e l'estensione del gufo e' installata" \
+            || { echo "ERRORE: estensione del gufo non installata"; ls -la "$profile" || true; exit 1; }
+          # secondo avvio: foto della nuova scheda
+          ( "$app/Contents/MacOS/freeowl" --headless --window-size=1280,800 \
+            --screenshot "$RUNNER_TEMP/nuova-scheda-mac.png" \
+            "moz-extension://6f1e0c2a-4b7d-4e8a-9c3f-0d5a7b2e9f41/newtab.html" & pid=$!; sleep 60; kill $pid 2>/dev/null ) || true
+          cp "$RUNNER_TEMP"/*.png dist-macos/ || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freeowl-macos
+          path: dist-macos/FreeOwl-*-macos-*.dmg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freeowl-macos-screenshots
+          path: dist-macos/*.png
+          if-no-files-found: ignore
 
   linux:
     needs: check
@@ -119,13 +170,13 @@ jobs:
           if-no-files-found: ignore
 
   publish:
-    needs: [check, windows, linux]
+    needs: [check, windows, linux, macos]
     if: >-
       always() &&
       github.event.inputs.publish != 'false' &&
       !contains(needs.*.result, 'failure') &&
       !contains(needs.*.result, 'cancelled') &&
-      (needs.windows.result == 'success' || needs.linux.result == 'success')
+      (needs.windows.result == 'success' || needs.linux.result == 'success' || needs.macos.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -159,6 +210,10 @@ jobs:
           ### Linux
           **Il modo piu' facile:** scarica \`FreeOwl-$VERSION-linux-x86_64.AppImage\`, rendilo eseguibile (tasto destro, Proprieta', "Consenti di eseguire come programma") e aprilo.
           **Oppure:** scarica il \`.tar.gz\`, estrailo e lancia \`./freeowl/install.sh\`: Free Owl comparira' nel menu delle applicazioni.
+
+          ### Mac
+          Scarica \`FreeOwl-$VERSION-macos-apple.dmg\` (Mac con chip Apple M1/M2/M3/M4) oppure \`FreeOwl-$VERSION-macos-intel.dmg\` (Mac Intel). Apri il .dmg e trascina Free Owl in Applicazioni.
+          Al primo avvio macOS lo blocca: vai in **Impostazioni di Sistema > Privacy e sicurezza** e clicca **Apri comunque** (Free Owl non ha la firma Apple a pagamento).
 
           ### SHA256
           \`\`\`

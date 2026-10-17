@@ -3,3 +3,4 @@ dist/
 download/
 tools/
 dist-linux/
+dist-macos/
