@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Free Owl · Il browser che ti protegge</title>
-  <meta name="description" content="Free Owl: un browser gratuito per Windows e Linux che blocca i tracker e rispetta la tua privacy. Basato su LibreWolf e Firefox.">
+  <meta name="description" content="Free Owl: un browser gratuito per Windows, Linux e Mac che blocca i tracker e rispetta la tua privacy. Basato su LibreWolf e Firefox.">
   <meta property="og:title" content="Free Owl 🦉">
   <meta property="og:description" content="Il browser gratuito che blocca i tracker e rispetta la tua privacy.">
   <meta property="og:image" content="https://ascaniolocorotondo.github.io/FreeOwl/img/screenshot.png">
@@ -267,10 +267,16 @@
       font-size: 15px;
     }
 
-    .soon {
-      text-align: center;
-      color: var(--cream-soft);
+    .mac-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 14px 0 6px;
     }
+
+    .mac-buttons .btn { font-size: 16px; padding: 12px 22px; }
+
+    .note ol { margin: 8px 0; }
 
     /* ---------- FAQ ---------- */
     details {
@@ -346,7 +352,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>
             <span id="dl-main-label">Scarica Free Owl</span>
           </a>
-          <small id="dl-main-info">Gratis · Windows e Linux</small>
+          <small id="dl-main-info">Gratis · Windows, Linux e Mac</small>
         </div>
         <p class="other-os" id="dl-other"></p>
 
@@ -447,7 +453,31 @@
         </div>
 
         <div class="panel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac" hidden>
-          <p class="soon">🍎 La versione per Mac è in arrivo. Il gufo sta ancora imparando a volare su macOS!</p>
+          <h3>Quale scaricare?</h3>
+          <p>Clicca la mela in alto a sinistra → <strong>Informazioni su questo Mac</strong>: se c'è scritto <strong>Chip Apple M1, M2, M3, M4…</strong> scegli Apple, se c'è <strong>Processore Intel</strong> scegli Intel.</p>
+          <div class="mac-buttons">
+            <a class="btn primary dl-mac-apple" href="https://github.com/ascaniolocorotondo/FreeOwl/releases/latest">Mac con chip Apple</a>
+            <a class="btn ghost dl-mac-intel" href="https://github.com/ascaniolocorotondo/FreeOwl/releases/latest">Mac Intel</a>
+          </div>
+
+          <h3>Installazione</h3>
+          <ol>
+            <li>Apri il file <code>.dmg</code> scaricato.</li>
+            <li>Trascina <strong>Free Owl</strong> nella cartella <strong>Applicazioni</strong>.</li>
+            <li>Apri Free Owl da Applicazioni.</li>
+          </ol>
+
+          <div class="note">
+            <strong>macOS dice che non può verificare Free Owl?</strong> È normale: Free Owl non ha la firma Apple a pagamento.
+            <ol>
+              <li>Clicca <strong>Fine</strong> sull'avviso.</li>
+              <li>Apri <strong>Impostazioni di Sistema</strong> → <strong>Privacy e sicurezza</strong>.</li>
+              <li>Scorri in basso e clicca <strong>Apri comunque</strong> accanto a "Free Owl", poi conferma con la tua password.</li>
+            </ol>
+            Va fatto solo la prima volta.
+          </div>
+          <p>Se preferisci il Terminale:</p>
+          <pre><code>xattr -dr com.apple.quarantine "/Applications/Free Owl.app"</code></pre>
         </div>
       </div>
     </section>
@@ -467,7 +497,7 @@
         </details>
         <details>
           <summary>Come si aggiorna?</summary>
-          <p>Scarica la nuova versione da questa pagina. Su Windows copia la cartella <code>Profiles</code> della vecchia versione dentro la nuova per tenere segnalibri e impostazioni. Su Linux i tuoi dati restano in <code>~/.freeowl</code>.</p>
+          <p>Scarica la nuova versione da questa pagina. Su Windows copia la cartella <code>Profiles</code> della vecchia versione dentro la nuova per tenere segnalibri e impostazioni. Su Linux e Mac i tuoi dati restano dove sono: basta sostituire l'app.</p>
         </details>
         <details>
           <summary>Posso usare il mio account Mozilla?</summary>
@@ -517,32 +547,36 @@
           const win = find(/windows-x86_64-portable\.zip$/);
           const appimage = find(/linux-x86_64\.AppImage$/);
           const targz = find(/linux-x86_64\.tar\.gz$/);
+          const macApple = find(/macos-apple\.dmg$/);
+          const macIntel = find(/macos-intel\.dmg$/);
           const version = rel.tag_name.replace(/^v/, "");
 
           const setAll = (sel, asset) => asset && document.querySelectorAll(sel).forEach(a => (a.href = asset.browser_download_url));
           setAll(".dl-windows", win);
           setAll(".dl-appimage", appimage);
           setAll(".dl-targz", targz);
+          setAll(".dl-mac-apple", macApple);
+          setAll(".dl-mac-intel", macIntel);
 
           const main = document.getElementById("dl-main");
           const label = document.getElementById("dl-main-label");
           const info = document.getElementById("dl-main-info");
           const other = document.getElementById("dl-other");
 
-          if (isMac) {
-            label.textContent = "Mac in arrivo: vedi le altre versioni";
-            info.textContent = `Versione ${version}`;
-            return;
-          }
-          const mine = isLinux ? appimage : win;
+          // Dal browser non si capisce in modo affidabile se il Mac e' Apple o Intel:
+          // proponiamo Apple (i Mac venduti dal 2020) e mettiamo Intel subito sotto.
+          const mine = isMac ? macApple : isLinux ? appimage : win;
           if (mine) {
             main.href = mine.browser_download_url;
-            label.textContent = isLinux ? "Scarica per Linux" : "Scarica per Windows";
-            info.textContent = `Versione ${version} · ${mb(mine.size)} · Gratis`;
+            label.textContent = isMac ? "Scarica per Mac" : isLinux ? "Scarica per Linux" : "Scarica per Windows";
+            info.textContent = `Versione ${version} · ${mb(mine.size)} · Gratis` + (isMac ? " · Mac con chip Apple" : "");
           }
-          other.innerHTML = isLinux
-            ? (win ? `Usi Windows? <a href="${win.browser_download_url}">Scarica per Windows</a>` : "")
-            : (appimage ? `Usi Linux? <a href="${appimage.browser_download_url}">Scarica per Linux</a>` : "");
+          const link = (asset, text) => (asset ? `<a href="${asset.browser_download_url}">${text}</a>` : "");
+          other.innerHTML = isMac
+            ? (macIntel ? `Mac Intel? ${link(macIntel, "Scarica la versione Intel")}` : "")
+            : isLinux
+              ? (win ? `Usi Windows? ${link(win, "Scarica per Windows")}` : "")
+              : [link(appimage, "Linux"), link(macApple, "Mac")].filter(Boolean).join(" · ").replace(/^(.+)$/, "Altri sistemi: $1");
         })
         .catch(() => {
           // Se GitHub non risponde, i pulsanti portano comunque alla pagina dei Download.
