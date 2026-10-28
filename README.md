@@ -9,6 +9,19 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/ascaniolocorotondo/FreeOwl/releases/latest"><img alt="Ultima versione" src="https://img.shields.io/github/v/release/ascaniolocorotondo/FreeOwl?label=versione&color=2ea44f"></a>
+  <a href="https://github.com/ascaniolocorotondo/FreeOwl/releases"><img alt="Download" src="https://img.shields.io/github/downloads/ascaniolocorotondo/FreeOwl/total?label=download"></a>
+  <img alt="Windows, Linux, Mac" src="https://img.shields.io/badge/Windows%20%C2%B7%20Linux%20%C2%B7%20Mac-64%20bit-555">
+  <a href="LICENSE"><img alt="Licenza MPL 2.0" src="https://img.shields.io/badge/licenza-MPL%202.0-blue"></a>
+</p>
+
+<p align="center">
+  <a href="https://ascaniolocorotondo.github.io/FreeOwl/"><strong>⬇️ Scarica Free Owl</strong></a> ·
+  <a href="#come-si-installa">Come si installa</a> ·
+  <a href="#-english">🇬🇧 English</a>
+</p>
+
+<p align="center">
   <img src="assets/screenshot.png" alt="La nuova scheda di Free Owl" width="800">
 </p>
 
@@ -114,6 +127,25 @@ python3 build_linux.py --appimage
 # Mac (serve Pillow: pip install pillow)
 python3 build_macos.py
 ```
+
+## Ti piace Free Owl?
+
+Lascia una ⭐ alla repo: aiuta altre persone a trovarlo. Hai trovato un problema o hai un'idea? Scrivila nelle [Issues](https://github.com/ascaniolocorotondo/FreeOwl/issues).
+
+## 🇬🇧 English
+
+**Free Owl** is a privacy-friendly browser for Windows, Linux and Mac, built on [LibreWolf](https://librewolf.net) and Firefox. It adds:
+
+- 🕐 a custom **new tab** with a big clock, greeting and quick search;
+- 🦉 an **owl counter** showing how many trackers were blocked, today and in total;
+- 🪶 **"Fly away"**, a button that wipes cookies, history, cache and open tabs while keeping passwords and accounts;
+- 🌙 a **Night mode** that darkens light websites without touching photos and videos;
+- 🔍 private search engines only (DuckDuckGo by default; Brave Search, Startpage, Mojeek, Qwant);
+- 🛡️ **uBlock Origin** preinstalled, third-party cookies blocked, cookie banners rejected automatically, HTTPS everywhere.
+
+**Download** from the [latest release](https://github.com/ascaniolocorotondo/FreeOwl/releases/latest): a portable `.zip` for Windows, an `.AppImage` or `.tar.gz` for Linux, and a `.dmg` for Mac (Apple Silicon or Intel). The app is unsigned, so Windows SmartScreen and macOS Gatekeeper will warn you the first time. Choose "Run anyway" or "Open anyway".
+
+New LibreWolf versions are picked up automatically every day by GitHub Actions. The interface of the owl extension is in Italian.
 
 ## Licenza e ringraziamenti
 
