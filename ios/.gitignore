@@ -1,6 +1,0 @@
-FreeOwl/Info.plist
-FreeOwl/blocklist.json
-FreeOwl.xcodeproj/
-build/
-Payload/
-*.ipa
