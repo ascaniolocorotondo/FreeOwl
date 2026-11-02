@@ -353,7 +353,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></svg>
             <span id="dl-main-label">Scarica Free Owl</span>
           </a>
-          <small id="dl-main-info">Gratis · Windows, Linux e Mac</small>
+          <small id="dl-main-info">Gratis · Windows, Linux, Mac e iPhone</small>
         </div>
         <p class="other-os" id="dl-other"></p>
 
@@ -421,6 +421,7 @@
           <button class="tab" role="tab" id="tab-windows" aria-controls="panel-windows" aria-selected="true">🪟 Windows</button>
           <button class="tab" role="tab" id="tab-linux" aria-controls="panel-linux" aria-selected="false">🐧 Linux</button>
           <button class="tab" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="false">🍎 Mac</button>
+          <button class="tab" role="tab" id="tab-iphone" aria-controls="panel-iphone" aria-selected="false">📱 iPhone</button>
         </div>
 
         <div class="panel" role="tabpanel" id="panel-windows" aria-labelledby="tab-windows">
@@ -480,6 +481,25 @@
           <p>Se preferisci il Terminale:</p>
           <pre><code>xattr -dr com.apple.quarantine "/Applications/Free Owl.app"</code></pre>
         </div>
+
+        <div class="panel" role="tabpanel" id="panel-iphone" aria-labelledby="tab-iphone" hidden>
+          <h3>Free Owl Shield</h3>
+          <p>Su iPhone e iPad il gufo arriva come <strong>Shield</strong>: blocca pubblicità, tracker e siti di truffa in Safari e in <strong>tutte le app</strong>. Gratis, senza App Store.</p>
+          <div class="mac-buttons">
+            <a class="btn primary" href="FreeOwl-Shield.mobileconfig">Installa Free Owl Shield</a>
+          </div>
+          <ol>
+            <li>Apri questa pagina con <strong>Safari</strong>, tocca il pulsante e poi <strong>Consenti</strong>.</li>
+            <li>Vai in <strong>Impostazioni</strong> → tocca <strong>Profilo scaricato</strong> in alto → <strong>Installa</strong>.</li>
+            <li>Inserisci il codice dell'iPhone e tocca ancora <strong>Installa</strong>. Fatto!</li>
+          </ol>
+          <div class="note">
+            <strong>Dice "Non verificato"?</strong> È normale: lo Shield non ha una firma Apple a pagamento.
+            Usa il DNS cifrato e gratuito di <a href="https://adguard-dns.io">AdGuard DNS</a>: non vede password né contenuti delle pagine, che restano cifrati.
+            <br><br>
+            <strong>Per toglierlo:</strong> Impostazioni → Generali → <strong>VPN e gestione dispositivi</strong> → Free Owl Shield → Rimuovi.
+          </div>
+        </div>
       </div>
     </section>
 
@@ -524,7 +544,10 @@
     (() => {
       const REPO = "ascaniolocorotondo/FreeOwl";
       const isLinux = /Linux|X11/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent);
-      const isMac = /Macintosh|Mac OS X/.test(navigator.userAgent);
+      // Gli iPad recenti si presentano come Mac: li riconosciamo dal touch
+      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+        (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+      const isMac = !isIOS && /Macintosh|Mac OS X/.test(navigator.userAgent);
 
       // Schede di installazione
       const tabs = document.querySelectorAll(".tab");
@@ -538,6 +561,14 @@
       tabs.forEach(t => t.addEventListener("click", () => selectTab(t.id)));
       if (isLinux) selectTab("tab-linux");
       if (isMac) selectTab("tab-mac");
+      if (isIOS) {
+        selectTab("tab-iphone");
+        document.getElementById("dl-main").href = "FreeOwl-Shield.mobileconfig";
+        document.getElementById("dl-main-label").textContent = "Installa Free Owl Shield";
+        document.getElementById("dl-main-info").textContent = "Gratis · Blocca pubblicità e tracker in tutto l'iPhone";
+        document.getElementById("dl-other").innerHTML = '<a href="#installa">Come si installa</a>';
+        return;
+      }
 
       // Link diretti all'ultima versione
       const mb = bytes => Math.round(bytes / 1048576) + " MB";
