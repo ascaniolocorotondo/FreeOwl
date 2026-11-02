@@ -1,0 +1,46 @@
+name: Build Free Owl iPhone
+
+# Compila l'app per iPhone su un Mac di GitHub (gratis per i repository pubblici)
+# e pubblica il file .ipa, non firmato, nella release "ios".
+# Chi la scarica la firma con il proprio Apple ID tramite SideStore.
+on:
+  push:
+    branches: [main]
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepara il progetto
+        working-directory: ios
+        run: |
+          brew install xcodegen
+          python3 make_blocklist.py FreeOwl/blocklist.json
+          xcodegen generate
+
+      - name: Compila
+        working-directory: ios
+        run: |
+          xcodebuild -project FreeOwl.xcodeproj -scheme FreeOwl -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/FreeOwl.app Payload/
+          zip -qry FreeOwl-iOS.ipa Payload
+
+      - name: Pubblica nei Download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # --latest=false: il sito usa "latest" per le versioni desktop
+          gh release view ios >/dev/null 2>&1 || gh release create ios --latest=false \
+            --title "Free Owl per iPhone" \
+            --notes "App per iPhone e iPad. Si installa con SideStore: istruzioni su https://ascaniolocorotondo.github.io/FreeOwl/#installa"
+          gh release upload ios ios/FreeOwl-iOS.ipa --clobber
