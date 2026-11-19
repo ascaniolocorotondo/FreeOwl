@@ -83,6 +83,10 @@ Si installa solo per il tuo utente (niente `sudo`). I tuoi dati stanno in `~/.fr
 
 I tuoi dati stanno in `~/Library/Application Support/Free Owl`, separati da un eventuale LibreWolf o Firefox.
 
+### 📱 iPhone (in prova)
+
+C'è anche una versione per iPhone e iPad, con il gufo, il blocco dei tracker, Vola via e la Modalità Notte. Per ora si prova con Xcode: le istruzioni sono in [`ios/`](ios/).
+
 ## Aggiornamenti
 
 Ogni giorno GitHub controlla in automatico se è uscita una nuova versione di LibreWolf. Se sì, costruisce e pubblica il nuovo Free Owl nei [Download](../../releases).
